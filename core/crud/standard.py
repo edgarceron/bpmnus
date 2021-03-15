@@ -5,15 +5,15 @@ from rest_framework.response import Response
 class Crud():
     """Manages the standard functions for crud in modules"""
 
-    def __init__(self, serializer_class, model_class, operation=None, after=None):
-        if operation is None:
-            self.operation = lambda x: x
+    def __init__(self, serializer_class, model_class, before_operation=None, after_operation=None):
+        if before_operation is None:
+            self.before_operation = lambda x: x
         else:
-            self.operation = operation
-        if after is None:
-            self.after = lambda x, y: y
+            self.before_operation = before_operation
+        if after_operation is None:
+            self.after_operation = lambda x, y: y
         else:
-            self.after = after
+            self.after_operation = after_operation
 
         self.serializer_class = serializer_class
         self.model_class = model_class
@@ -28,7 +28,7 @@ class Crud():
             data_serializer = self.serializer_class(data=data)
         if data_serializer.is_valid():
             model_obj = data_serializer.save()
-            self.after(request, data_serializer)
+            self.after_operation(request, data_serializer)
             return {"success": True, "id": model_obj.pk}, status.HTTP_201_CREATED
 
         answer = self.error_data(data_serializer)
@@ -36,7 +36,7 @@ class Crud():
 
     def add(self, request, action_name):
         """Tries to create a row in the database and returns the result"""
-        data = self.operation(request.data.copy())
+        data = self.before_operation(request.data.copy())
         answer, answer_status = self.save_instance(data, request)
         return Response(
             answer,
@@ -46,7 +46,7 @@ class Crud():
 
     def replace(self, request, identifier, action_name):
         """Tries to update a row in the db and returns the result"""    
-        data = self.operation(request.data.copy())
+        data = self.before_operation(request.data.copy())
         answer, answer_status =  self.save_instance(data, request, identifier)
         return Response(
             answer,
@@ -60,13 +60,13 @@ class Crud():
             model_obj = self.model_class.objects.get(pk=identifier)
             data_serializer = self.serializer_class(model_obj)
             model_data = data_serializer.data.copy()
-            model_data = self.operation(model_data)
+            model_data = self.before_operation(model_data)
 
             data = {
                 "success": True,
                 "data": model_data
             }
-            data = self.after(request, data)
+            data = self.after_operation(request, data)
 
             return Response(
                 data,
@@ -115,7 +115,7 @@ class Crud():
     def picker_search(self, request, action_name):
         """Returns a JSON response with data for a selectpicker."""
         value = request.data['value']
-        queryset = self.operation(value)
+        queryset = self.before_operation(value)
         serializer = self.serializer_class(queryset, many=True)
         result = serializer.data
         data = {
@@ -135,17 +135,17 @@ class Crud():
         records_total = self.model_class.objects.count()
 
         if search != '':
-            queryset = self.operation(
+            queryset = self.before_operation(
                 search, start, length
             )
-            records_filtered = self.operation(
+            records_filtered = self.before_operation(
                 search, start, length, True
             )
         else:
             queryset = self.model_class.objects.all()[start:start + length]
             records_filtered = records_total
 
-        queryset = self.after(request, queryset)
+        queryset = self.after_operation(request, queryset)
         result = self.serializer_class(queryset, many=True)
         data = {
             'draw': draw,
