@@ -1,24 +1,16 @@
 """Standard functions for crud"""
 from rest_framework import status
 from rest_framework.response import Response
+from core.crud.exeptions import NonCallableParam
 
 class Crud():
     """Manages the standard functions for crud in modules"""
 
-    def __init__(self, serializer_class, model_class, before_operation=None, after_operation=None):
-        if before_operation is None:
-            self.before_operation = lambda x: x
-        else:
-            self.before_operation = before_operation
-        if after_operation is None:
-            self.after_operation = lambda x, y: y
-        else:
-            self.after_operation = after_operation
-
+    def __init__(self, serializer_class, model_class):
         self.serializer_class = serializer_class
         self.model_class = model_class
 
-    def save_instance(self, data, request=None, identifier=0):
+    def save_instance(self, data, request=None, identifier=0, after_save=None):
         """Saves a model intance"""
         if identifier:
             model_obj = self.model_class.objects.get(pk=identifier)
@@ -28,15 +20,17 @@ class Crud():
             data_serializer = self.serializer_class(data=data)
         if data_serializer.is_valid():
             model_obj = data_serializer.save()
-            self.after_operation(request, data_serializer)
+            if Crud.validate_function(after_save):
+                after_save(request, data_serializer)
             return {"success": True, "id": model_obj.pk}, status.HTTP_201_CREATED
 
         answer = self.error_data(data_serializer)
         return answer, status.HTTP_400_BAD_REQUEST
 
-    def add(self, request, action_name):
+    def add(self, request, before_add=None):
         """Tries to create a row in the database and returns the result"""
-        data = self.before_operation(request.data.copy())
+        if Crud.validate_function(before_add):
+            data = before_add(request.data.copy())
         answer, answer_status = self.save_instance(data, request)
         return Response(
             answer,
@@ -44,9 +38,10 @@ class Crud():
             content_type='application/json'
         )
 
-    def replace(self, request, identifier, action_name):
+    def replace(self, request, identifier, before_replace=None):
         """Tries to update a row in the db and returns the result"""    
-        data = self.before_operation(request.data.copy())
+        if Crud.validate_function(before_replace):
+            data = before_replace(request.data.copy())
         answer, answer_status =  self.save_instance(data, request, identifier)
         return Response(
             answer,
@@ -54,19 +49,22 @@ class Crud():
             content_type='application/json'
         )
 
-    def get(self, request, identifier, action_name):
+    def get(self, request, identifier, alter_model=None, alter_return=None):
         """Return a JSON response with data for the given id"""
         try:
             model_obj = self.model_class.objects.get(pk=identifier)
             data_serializer = self.serializer_class(model_obj)
             model_data = data_serializer.data.copy()
-            model_data = self.before_operation(model_data)
+            if Crud.validate_function(alter_model):
+                model_data = alter_model(model_data)
 
             data = {
                 "success": True,
                 "data": model_data
             }
-            data = self.after_operation(request, data)
+
+            if Crud.validate_function(alter_return):
+                data = alter_return(request, data)
 
             return Response(
                 data,
@@ -84,7 +82,7 @@ class Crud():
                 content_type='application/json'
             )
 
-    def delete(self, request, identifier, action_name, message):
+    def delete(self, identifier, message):
         """Tries to delete a row from db and returns the result"""
         model_obj = self.model_class.objects.get(id=identifier)
         model_obj.delete()
@@ -94,7 +92,7 @@ class Crud():
         }
         return Response(data, status=status.HTTP_200_OK, content_type='application/json')
 
-    def toggle(self, request, identifier, action_name, data_name):
+    def toggle(self, identifier, data_name):
         """Toogles the active state for a given row"""
         model_obj = self.model_class.objects.get(id=identifier)
         previous = model_obj.active
@@ -112,10 +110,10 @@ class Crud():
         }
         return Response(data, status=status.HTTP_200_OK, content_type='application/json')
 
-    def picker_search(self, request, action_name):
+    def picker_search(self, request, filter_function):
         """Returns a JSON response with data for a selectpicker."""
         value = request.data['value']
-        queryset = self.before_operation(value)
+        queryset = filter_function(value)
         serializer = self.serializer_class(queryset, many=True)
         result = serializer.data
         data = {
@@ -124,7 +122,7 @@ class Crud():
         }
         return Response(data, status=status.HTTP_200_OK, content_type='application/json')
 
-    def listing(self, request, action_name):
+    def listing(self, request, listing_filter):
         """ Returns a JSON response containing registered users"""
         sent_data = request.data
         draw = int(sent_data['draw'])
@@ -135,17 +133,12 @@ class Crud():
         records_total = self.model_class.objects.count()
 
         if search != '':
-            queryset = self.before_operation(
-                search, start, length
-            )
-            records_filtered = self.before_operation(
-                search, start, length, True
-            )
+            queryset = listing_filter(search, start, length)
+            records_filtered = listing_filter(search, start, length, True)
         else:
             queryset = self.model_class.objects.all()[start:start + length]
             records_filtered = records_total
 
-        queryset = self.after_operation(request, queryset)
         result = self.serializer_class(queryset, many=True)
         data = {
             'draw': draw,
@@ -173,3 +166,12 @@ class Crud():
             }
         }
         return data
+
+    @staticmethod
+    def validate_function(f):
+        """Checks if the given parameter is a function"""
+        if f is None:
+            return False
+        if callable(f):
+            return True
+        raise NonCallableParam
