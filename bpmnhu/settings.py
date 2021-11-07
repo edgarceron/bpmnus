@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-
+import datetime
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,10 +37,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework.authtoken',
     'rest_framework',
     'corsheaders',
     'projects',
-    'core'
+    'usersapi',
+    'dj_rest_auth',
+    'core',
 ]
 
 MIDDLEWARE = [
@@ -108,10 +111,26 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_SESSION_LOGIN = True
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+SITE_ID = 1
+ACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
+
+REST_USE_JWT = True
+JWT_AUTH_COOKIE = 'auth'
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=7),
+}
+
 REST_FRAMEWORK = { 
-    'DEFAULT_AUTHENTICATION_CLASSES': (  
-        'rest_framework.authentication.SessionAuthentication'  
-    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': [ 
+        'rest_framework.authentication.TokenAuthentication',
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication'
+    ],
     'DEFAULT_PERMISSION_CLASSES': [  
         'rest_framework.permissions.IsAuthenticated'  
     ]
@@ -138,7 +157,18 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 CORS_ORIGIN_ALLOW_ALL = False
+CORS_ALLOW_CREDENTIALS = True
 
 CORS_ORIGIN_WHITELIST = (
-       'http://127.0.0.1:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:3000',
+    'https://127.0.0.1:3000',
+    'https://localhost:3000',
 )
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'https://127.0.0.1:3000',
+    'https://localhost:3000',
+]

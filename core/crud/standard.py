@@ -125,7 +125,6 @@ class Crud():
     def listing(self, request, listing_filter):
         """ Returns a JSON response containing registered users"""
         sent_data = request.data
-        draw = int(sent_data['draw'])
         start = int(sent_data['start'])
         length = int(sent_data['length'])
         search = sent_data['search[value]']
@@ -141,7 +140,6 @@ class Crud():
 
         result = self.serializer_class(queryset, many=True)
         data = {
-            'draw': draw,
             'recordsTotal': records_total,
             'recordsFiltered': records_filtered,
             'data': result.data
