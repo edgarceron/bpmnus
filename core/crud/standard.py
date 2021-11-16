@@ -1,12 +1,16 @@
 """Standard functions for crud"""
+from typing import Callable
+from django.db.models.query import QuerySet
 from rest_framework import status
 from rest_framework.response import Response
 from core.crud.exeptions import NonCallableParam
+from django.db.models import Model
+from rest_framework.serializers import Serializer
 
 class Crud():
     """Manages the standard functions for crud in modules"""
 
-    def __init__(self, serializer_class, model_class):
+    def __init__(self, serializer_class: Serializer, model_class: Model):
         self.serializer_class = serializer_class
         self.model_class = model_class
 
@@ -122,22 +126,30 @@ class Crud():
         }
         return Response(data, status=status.HTTP_200_OK, content_type='application/json')
 
-    def listing(self, request, listing_filter):
+    def listing(self, request, listing_filter: Callable[[str], QuerySet]):
         """ Returns a JSON response containing registered users"""
         sent_data = request.data
         start = int(sent_data['start'])
         length = int(sent_data['length'])
         search = sent_data['search[value]']
+        order = sent_data['order']
+        orderBy = sent_data['orderBy']
 
         records_total = self.model_class.objects.count()
 
         if search != '':
-            queryset = listing_filter(search, start, length)
-            records_filtered = listing_filter(search, start, length, True)
+            queryset = listing_filter(search)
+            records_filtered = listing_filter(search, True)
         else:
-            queryset = self.model_class.objects.all()[start:start + length]
+            queryset = self.model_class.objects.all()
             records_filtered = records_total
 
+        if orderBy != "":
+            if order != "":
+                orderBy = "-" + orderBy if order == "desc" else orderBy
+            queryset = queryset.order_by(orderBy)
+        queryset = queryset[start:start + length]
+        
         result = self.serializer_class(queryset, many=True)
         data = {
             'recordsTotal': records_total,

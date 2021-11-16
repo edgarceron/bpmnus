@@ -8,7 +8,7 @@ def project_picker_filter(value):
         Q(name__icontains=value)
     )[:10])
 
-def project_listing_filter(search, start, length, count=False):
+def project_listing_filter(search, count=False):
     """Filters the corresponding models given a search string"""
     if count:
         return Projects.objects.filter(
@@ -17,4 +17,4 @@ def project_listing_filter(search, start, length, count=False):
 
     return Projects.objects.filter(
         Q(name__icontains=search)
-    )[start:start + length]
+    )
