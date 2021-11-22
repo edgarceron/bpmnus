@@ -1,5 +1,6 @@
 """Standard functions for crud"""
 from typing import Callable
+from django.db.models import query
 from django.db.models.query import QuerySet
 from rest_framework import status
 from rest_framework.response import Response
@@ -131,15 +132,16 @@ class Crud():
         sent_data = request.data
         start = int(sent_data['start'])
         length = int(sent_data['length'])
-        search = sent_data['search[value]']
         order = sent_data['order']
         orderBy = sent_data['orderBy']
+        filters = sent_data['filters']
 
         records_total = self.model_class.objects.count()
 
-        if search != '':
-            queryset = listing_filter(search)
-            records_filtered = listing_filter(search, True)
+        if filters != {}:
+            queryset = listing_filter(filters)
+            records_filtered = listing_filter(filters, True)
+        
         else:
             queryset = self.model_class.objects.all()
             records_filtered = records_total
