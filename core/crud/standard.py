@@ -97,6 +97,16 @@ class Crud():
         }
         return Response(data, status=status.HTTP_200_OK, content_type='application/json')
 
+    def delete_bulk(self, request):
+        """Tries to delete a row from db and returns the result"""
+        model_obj = self.model_class.objects.filter(pk__in=request.data['pks'])
+        objects_deleted = model_obj.delete()
+        data = {
+            "success": True,
+            "objects_deleted": objects_deleted,
+        }
+        return Response(data, status=status.HTTP_200_OK, content_type='application/json')
+
     def toggle(self, identifier, data_name):
         """Toogles the active state for a given row"""
         model_obj = self.model_class.objects.get(id=identifier)

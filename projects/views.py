@@ -29,6 +29,12 @@ def delete_project(request, project_id):
     crud_object = Crud(ProjectsSerializer, Projects)
     return crud_object.delete(project_id, "Proyecto elminado exitosamente")
 
+@api_view(['DELETE'])
+def delete_bulk_project(request):
+    """Tries to delete an project and returns the result."""
+    crud_object = Crud(ProjectsSerializer, Projects)
+    return crud_object.delete(request, "Proyecto elminado exitosamente")
+
 @api_view(['POST', 'OPTIONS'])
 def list_project(request):
     """Returns a JSON response containing registered project for a datatable"""
