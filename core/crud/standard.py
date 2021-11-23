@@ -99,7 +99,7 @@ class Crud():
 
     def delete_bulk(self, request):
         """Tries to delete a row from db and returns the result"""
-        model_obj = self.model_class.objects.filter(pk__in=request.data['pks'])
+        model_obj = self.model_class.objects.filter(pk__in=request.data)
         objects_deleted = model_obj.delete()
         data = {
             "success": True,

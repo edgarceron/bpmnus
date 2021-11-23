@@ -33,7 +33,7 @@ def delete_project(request, project_id):
 def delete_bulk_project(request):
     """Tries to delete an project and returns the result."""
     crud_object = Crud(ProjectsSerializer, Projects)
-    return crud_object.delete(request, "Proyecto elminado exitosamente")
+    return crud_object.delete_bulk(request)
 
 @api_view(['POST', 'OPTIONS'])
 def list_project(request):
