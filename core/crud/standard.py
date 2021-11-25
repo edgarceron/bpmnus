@@ -36,6 +36,8 @@ class Crud():
         """Tries to create a row in the database and returns the result"""
         if Crud.validate_function(before_add):
             data = before_add(request.data.copy())
+        else:
+            data = request.data.copy()
         answer, answer_status = self.save_instance(data, request)
         return Response(
             answer,
@@ -173,21 +175,19 @@ class Crud():
     @staticmethod
     def error_data(serializer):
         """Return a common JSON error result"""
-        error_details = []
+        error_details = {}
         for key in serializer.errors.keys():
-            error_details.append(
-                {"field": key, "message": serializer.errors[key][0]})
+            error_details[key] = serializer.errors[key]
 
         data = {
             "succes": False,
             "Error": {
                 "success": False,
-                "status": 400,
                 "message": "Los datos enviados no son validos",
                 "details": error_details
             }
         }
-        return data
+        return error_details
 
     @staticmethod
     def validate_function(f):
