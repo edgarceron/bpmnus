@@ -2,7 +2,7 @@
 from rest_framework.decorators import api_view
 from core.crud.standard import Crud
 from projects.business_logic import data_filters
-from projects.business_logic.data_alter import before_save_project
+from projects.business_logic.data_alter import before_save_project, before_update_project
 
 from .models import Projects
 from .serializers import ProjectsSerializer
@@ -17,7 +17,7 @@ def add_project(request):
 def replace_project(request, project_id):
     "Tries to update a project and returns the result"
     crud_object = Crud(ProjectsSerializer, Projects)
-    return crud_object.replace(request, project_id)
+    return crud_object.replace(request, project_id, before_update_project(project_id))
 
 @api_view(['GET'])
 def get_project(request, project_id):

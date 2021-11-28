@@ -11,8 +11,11 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import datetime
 from pathlib import Path
-
+from django.contrib.staticfiles import handlers
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+
+
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -155,6 +158,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = '/var/www/static/'
 
 REST_FRAMEWORK = {
     'DATETIME_FORMAT': "%Y-%m-%d",
@@ -176,3 +180,16 @@ CORS_ALLOWED_ORIGINS = [
     'https://127.0.0.1:3000',
     'https://localhost:3000',
 ]
+
+
+class CORSStaticFilesHandler(handlers.StaticFilesHandler):
+    def serve(self, request):
+        response = super().serve(request)
+        try:
+            if request.headers['Origin'] in CORS_ALLOWED_ORIGINS:
+                response['Access-Control-Allow-Origin'] = '*'
+        except KeyError:
+            pass
+        return response
+
+handlers.StaticFilesHandler = CORSStaticFilesHandler

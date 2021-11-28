@@ -49,6 +49,8 @@ class Crud():
         """Tries to update a row in the db and returns the result"""    
         if Crud.validate_function(before_replace):
             data = before_replace(request.data.copy())
+        else:
+            data = request.data.copy()
         answer, answer_status =  self.save_instance(data, request, identifier)
         return Response(
             answer,

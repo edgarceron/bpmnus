@@ -17,6 +17,6 @@ class ProjectsSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         instance.name = validated_data['name']
         instance.desc = validated_data['desc']
-        instance.creation_date = validated_data['creation_date'].split("T")[0]
+        instance.creation_date = validated_data['creation_date']
         instance.save()
         return instance
