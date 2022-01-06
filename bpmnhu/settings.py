@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'projects',
+    'diagrams',
     'usersapi',
     'dj_rest_auth',
     'core',
