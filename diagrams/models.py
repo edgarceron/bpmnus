@@ -7,6 +7,6 @@ class Diagrams(models.Model):
     project = models.ForeignKey(Projects, on_delete=models.DO_NOTHING)
     name = models.TextField()
     desc = models.TextField()
-    file = models.FileField(upload_to='xml/')
+    xml = models.TextField()
     propierties = models.TextField()
     creation_date = models.DateTimeField()

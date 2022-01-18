@@ -2,7 +2,7 @@
 from rest_framework.decorators import api_view
 from core.crud.standard import Crud
 from diagrams.business_logic import data_filters
-from diagrams.business_logic.data_alter import add_request_files, before_update_diagram
+from diagrams.business_logic.data_alter import add_request_files
 
 from .models import Diagrams
 from .serializers import DiagramsSerializer
@@ -17,7 +17,7 @@ def add_diagram(request):
 def replace_diagram(request, diagram_id):
     "Tries to update a diagram and returns the result"
     crud_object = Crud(DiagramsSerializer, Diagrams)
-    return crud_object.replace(request, diagram_id, before_update_diagram(diagram_id, request))
+    return crud_object.replace(request, diagram_id, add_request_files(request))
 
 @api_view(['GET'])
 def get_diagram(request, diagram_id):
