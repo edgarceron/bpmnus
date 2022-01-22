@@ -12,3 +12,15 @@ services:
       - /var/lib/postgresql/data/
     ports:
       - 5432:5432
+
+  bpmnus:
+    image: edgarceron1993/bpmnus
+    restart: always
+    volumes:
+      - /var/www/static/
+    ports:
+      - 8020:8020
+    depends_on:
+      - "db"
+    command: ["./wait-for-it.sh", "db", "python", "manage.py migrate"]
+
