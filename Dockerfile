@@ -16,6 +16,5 @@ RUN chown -R www-data:www-data /opt/app
 EXPOSE 8020
 STOPSIGNAL SIGTERM
 RUN chmod 777 /opt/app/bpmnus/start_server.sh
+RUN git pull origin master
 CMD ["./start_server.sh"]
-RUN python manage.py makemigrations
-RUN python manage.py migrate
