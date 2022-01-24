@@ -17,6 +17,5 @@ EXPOSE 8020
 STOPSIGNAL SIGTERM
 RUN chmod 777 /opt/app/bpmnus/start_server.sh
 CMD ["./start_server.sh"]
-RUN python manage.py check_postgres_ready
 RUN python manage.py makemigrations
 RUN python manage.py migrate

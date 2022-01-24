@@ -21,9 +21,8 @@ services:
     ports:
       - 8020:8020
     depends_on:
-      - "db"
-    command: ["./wait-for-it.sh", "db", "python", "manage.py migrate"]
-
+      db:
+        condition: service_healthy
 
   nginx:
     image: edgarceron1993/nginxbpmnus

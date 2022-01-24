@@ -91,7 +91,7 @@ DATABASES = {
         'NAME': 'bpmnus',
         'USER': 'bpmnus',
         'PASSWORD': 'bpmnus',
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '',
     }
 }
