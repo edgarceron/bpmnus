@@ -24,3 +24,12 @@ services:
       - "db"
     command: ["./wait-for-it.sh", "db", "python", "manage.py migrate"]
 
+
+  nginx:
+    image: edgarceron1993/nginxbpmnus
+    depends_on:
+      - bpmnus
+      - bpmnusfront
+    restart: always
+    ports:
+      - "80:80"
