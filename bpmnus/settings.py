@@ -18,7 +18,7 @@ from django.contrib.staticfiles import handlers
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+ALLOWED_HOSTS = ['bpmnus', 'localhost', '127.0.0.1']
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
@@ -175,7 +175,6 @@ CORS_ORIGIN_WHITELIST = (
     'https://localhost:3000',
     'https://client:3000',
     'https://client:3000',
-    
 )
 
 CORS_ALLOWED_ORIGINS = [

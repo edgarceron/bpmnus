@@ -10,26 +10,22 @@ services:
       - database.env
     volumes:
       - /var/lib/postgresql/data/
-    ports:
-      - 5432:5432
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U root"]
-      interval: 60s
+      test: ["CMD-SHELL", "pg_isready -U bpmnus"]
+      interval: 5s
 
   bpmnus:
     image: edgarceron1993/bpmnus
     restart: always
     volumes:
       - /var/www/static/
-    ports:
-      - 8020:8020
-    entrypoint:
-      - /bin/bash
-      - -c
-      - "wait-for-it db:5432 -s -t 60 -- python manage.py migrate"
     depends_on:
       db:
         condition: service_healthy
+
+  bpmnusfront:
+    image: edgarceron1993/bpmnusfront
+    command: npm start
 
   nginx:
     image: edgarceron1993/nginxbpmnus
@@ -38,4 +34,4 @@ services:
       - bpmnusfront
     restart: always
     ports:
-      - "80:80"
+      - 80:80

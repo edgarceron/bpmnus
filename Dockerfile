@@ -16,5 +16,5 @@ RUN chown -R www-data:www-data /opt/app
 EXPOSE 8020
 STOPSIGNAL SIGTERM
 RUN chmod 777 /opt/app/bpmnus/start_server.sh
-RUN git pull origin master
+RUN chmod 777 /opt/app/bpmnus/wait-for-it.sh
 CMD ["./start_server.sh"]
