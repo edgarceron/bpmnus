@@ -4,6 +4,7 @@ import psycopg2, time
 class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         is_online = False
+        conn = None
         while(not is_online):
             try:
                 print('Connecting to the PostgreSQL database...')
