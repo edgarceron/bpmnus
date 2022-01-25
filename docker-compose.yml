@@ -13,25 +13,27 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U bpmnus"]
       interval: 5s
-
-  bpmnus:
-    image: edgarceron1993/bpmnus
-    restart: always
-    volumes:
-      - /var/www/static/
-    depends_on:
-      db:
-        condition: service_healthy
-
-  bpmnusfront:
-    image: edgarceron1993/bpmnusfront
-    command: npm start
-
-  nginx:
-    image: edgarceron1993/nginxbpmnus
-    depends_on:
-      - bpmnus
-      - bpmnusfront
-    restart: always
     ports:
-      - 80:80
+      - 5432:5432
+
+  # bpmnus:
+  #   image: edgarceron1993/bpmnus
+  #   restart: always
+  #   volumes:
+  #     - /var/www/static/
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+
+  # bpmnusfront:
+  #   image: edgarceron1993/bpmnusfront
+  #   command: npm start
+
+  # nginx:
+  #   image: edgarceron1993/nginxbpmnus
+  #   depends_on:
+  #     - bpmnus
+  #     - bpmnusfront
+  #   restart: always
+  #   ports:
+  #     - 80:80

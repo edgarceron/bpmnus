@@ -4,13 +4,15 @@ from xhtml2pdf import pisa
 from django.template import loader
 from django.conf import settings
 from diagrams.models import Diagrams
+from rest_framework import status
+from rest_framework.response import Response
 
 
 def get_diagram(id: int) -> Diagrams:
     try:
         return Diagrams.objects.get(pk=id)
     except Diagrams.DoesNotExist:
-        raise
+        return None
 
 
 def transform_to_obj(xml: str) -> dict:
@@ -19,13 +21,15 @@ def transform_to_obj(xml: str) -> dict:
 
 def get_participants(diagram: dict) -> list:
     try:
-        return diagram['bpmn:definitions']['bpmn:collaboration']['bpmn:participant']
+        participants = diagram['bpmn:definitions']['bpmn:collaboration']['bpmn:participant']
+        return participants if isinstance(participants, list) else [participants]
     except KeyError:
         return []
 
 
 def get_participant_activities(diagram: dict, process_ref: str) -> list:
     processes = diagram['bpmn:definitions']['bpmn:process']
+    processes = processes if isinstance(processes, list) else [processes]
     for i in processes:
         if i['@id'] == process_ref:
             return i['bpmn:task'] if isinstance(i['bpmn:task'], list) else [i['bpmn:task']]
@@ -34,11 +38,13 @@ def get_participant_activities(diagram: dict, process_ref: str) -> list:
 
 def get_data_for_us(diagram_id):
     diagram_data = get_diagram(diagram_id)
+    data = []
+    if diagram_data is None:
+        return data
     xml = diagram_data.xml
     props = json.loads(diagram_data.propierties)
     diagram = transform_to_obj(xml)
     participants = get_participants(diagram)
-    data = []
     for role in participants:
         name = role['@name']
         tasks = get_participant_activities(diagram, role['@processRef'])
@@ -71,4 +77,20 @@ def create_diagram_us(diagram_id):
     for us in data:
         generate_us(us)
 
-d = create_diagram_us(9)
+    if data == []:
+        message = "No se generaron historias para el diagrama escogido"
+        status_code = status.HTTP_204_NO_CONTENT
+    else:
+        message = "Se generaron {} historia/s para el diagrama escogido".format(str(len(data)))
+        status_code = status.HTTP_200_OK
+
+    
+    answer = {
+        "message": message
+    }
+
+    return Response(
+            answer,
+            status=status_code,
+            content_type='application/json'
+    )

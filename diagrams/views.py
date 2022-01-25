@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view
 from core.crud.standard import Crud
 from diagrams.business_logic import data_filters
 from diagrams.business_logic.data_alter import add_request_files
-
+from diagrams.business_logic.transform_xml import create_diagram_us
 from .models import Diagrams
 from .serializers import DiagramsSerializer
 
@@ -42,3 +42,8 @@ def list_diagram(request):
     """Returns a JSON response containing registered diagram for a datatable"""
     crud_object = Crud(DiagramsSerializer, Diagrams)
     return crud_object.listing(request, data_filters.diagram_listing_filter)
+
+@api_view(['GET'])
+def diagram_to_us(request, diagram_id):
+    "Return a JSON response with diagram data for the given id"
+    return create_diagram_us(diagram_id)
