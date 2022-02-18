@@ -57,7 +57,11 @@ def get_data_for_us(diagram_id):
                 'project': diagram_data.project.name,
                 'actor': name,
                 'title': props[task_id].get('name', ''),
-                'desc':  props[task_id].get('desc', '')
+                'desc':  props[task_id].get('desc', ''),
+                'priority':  props[task_id].get('priority', ''),
+                'criteria':  props[task_id].get('criteria', ''),
+                'points':  props[task_id].get('points', ''),
+                'restrictionsw':  props[task_id].get('restrictions', ''),
             })
     return data
 

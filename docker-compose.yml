@@ -16,24 +16,24 @@ services:
     ports:
       - 5432:5432
 
-  # bpmnus:
-  #   image: edgarceron1993/bpmnus
-  #   restart: always
-  #   volumes:
-  #     - /var/www/static/
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
+  bpmnus:
+    image: edgarceron1993/bpmnus
+    restart: always
+    volumes:
+      - /var/www/static/
+    depends_on:
+      db:
+        condition: service_healthy
 
-  # bpmnusfront:
-  #   image: edgarceron1993/bpmnusfront
-  #   command: npm start
+  bpmnusfront:
+    image: edgarceron1993/bpmnusfront
+    command: npm start
 
-  # nginx:
-  #   image: edgarceron1993/nginxbpmnus
-  #   depends_on:
-  #     - bpmnus
-  #     - bpmnusfront
-  #   restart: always
-  #   ports:
-  #     - 80:80
+  nginx:
+    image: edgarceron1993/nginxbpmnus
+    depends_on:
+      - bpmnus
+      - bpmnusfront
+    restart: always
+    ports:
+      - 80:80
