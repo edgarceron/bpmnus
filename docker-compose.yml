@@ -16,14 +16,22 @@ services:
     ports:
       - 5432:5432
 
+  migration:
+    image: edgarceron1993/bpmnus
+    command: python manage.py migrate --noinput
+    volumes:
+      - /var/www/static/
+    depends_on:
+      db:
+        condition: service_healthy
+
   bpmnus:
     image: edgarceron1993/bpmnus
     restart: always
     volumes:
       - /var/www/static/
     depends_on:
-      db:
-        condition: service_healthy
+      - migration
 
   bpmnusfront:
     image: edgarceron1993/bpmnusfront

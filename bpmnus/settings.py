@@ -89,7 +89,7 @@ DATABASES = {
         'NAME': 'bpmnus',
         'USER': 'bpmnus',
         'PASSWORD': 'bpmnus',
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '',
     }
 }
@@ -167,7 +167,6 @@ REST_FRAMEWORK = {
 }
 
 USE_X_FORWARDED_HOST = True
-FORCE_SCRIPT_NAME = '/bpmnus'
 
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = True
