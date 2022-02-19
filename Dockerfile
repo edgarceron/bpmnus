@@ -18,4 +18,4 @@ EXPOSE 8020
 STOPSIGNAL SIGTERM
 RUN chmod 777 /opt/app/bpmnus/buildfiles/start_server.sh
 RUN chmod 777 /opt/app/bpmnus/buildfiles/wait-for-it.sh
-CMD ["./start_server.sh"]
+CMD ["/opt/app/bpmnus/buildfiles/start_server.sh"]

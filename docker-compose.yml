@@ -27,7 +27,6 @@ services:
 
   bpmnusfront:
     image: edgarceron1993/bpmnusfront
-    command: npm start
 
   nginx:
     image: edgarceron1993/nginxbpmnus
