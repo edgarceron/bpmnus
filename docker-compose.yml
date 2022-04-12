@@ -1,4 +1,3 @@
-# Use postgres/example user/password credentials
 version: '3.1'
 
 services:
@@ -6,15 +5,15 @@ services:
   db:
     image: postgres
     restart: always
-    env_file:
-      - database.env
+    environment:
+        POSTGRES_USER: bpmnus
+        POSTGRES_PASSWORD: bpmnus
+        POSTGRES_DB: bpmnus
     volumes:
       - /var/lib/postgresql/data/
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U bpmnus"]
       interval: 5s
-    ports:
-      - 5432:5432
 
   migration:
     image: edgarceron1993/bpmnus
