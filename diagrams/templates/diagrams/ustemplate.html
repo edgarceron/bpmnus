@@ -506,6 +506,9 @@
         <tr class="c18">
           <td class="c14" colspan="3" rowspan="1">
             <p class="c10"><span class="c15 c2">Dependencias: </span></p>
+            {% for o in relations %}
+              <p class="c10"><span class="c15 c2"> {{ o }} </span></p>
+            {% endfor %}
           </td>
         </tr>
       </tbody>
