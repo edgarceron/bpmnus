@@ -61,9 +61,13 @@ def get_dependencies(diagram: dict):
 def get_collaboration_flows(diagram: dict, dependencies: dict):
     if 'bpmn:messageFlow' in diagram['bpmn:definitions']['bpmn:collaboration']:
         flows = diagram['bpmn:definitions']['bpmn:collaboration']['bpmn:messageFlow']
+        flows = flows if isinstance(flows, list) else [flows]
         for m in flows:
             if '@sourceRef' in m:
-                add_depend(m['@id'], m['@sourceRef'], dependencies)
+                add_depend(
+                    m['@id'], 
+                    m['@sourceRef'], 
+                    dependencies)
 
 def get_activity_relations(activity: dict, dependencies: dict):
     relations = []
